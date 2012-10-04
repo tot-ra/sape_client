@@ -23,6 +23,8 @@
  */
 class SAPE_base {
 
+	static public $dir = '';
+
     var $_version = '1.1.6';
 
     var $_verbose = false;
@@ -68,11 +70,16 @@ class SAPE_base {
 
 	var $_is_block_ins_beforeall_showed = false;
 
-    function SAPE_base($options = null) {
+    function __construct($options = null) {
 
         // Поехали :o)
 
         $host = '';
+
+		self::$dir = dirname(__FILE__);
+		if(isset($options['dir'])){
+			self::$dir = $options['dir'];
+		}
 
         if (is_array($options)) {
             if (isset($options['host'])) {
@@ -347,8 +354,9 @@ class SAPE_base {
 
         if (!is_file($this->_db_file)) {
             // Пытаемся создать файл.
-            if (@touch($this->_db_file)) {
-                @chmod($this->_db_file, 0666); // Права доступа
+            if (
+				touch($this->_db_file)) {
+                chmod($this->_db_file, 0666); // Права доступа
             } else {
                 return $this->raise_error('Нет файла ' . $this->_db_file . '. Создать не удалось. Выставите права 777 на папку.');
             }
@@ -434,7 +442,7 @@ class SAPE_client extends SAPE_base {
     var $_user_agent = 'SAPE_Client PHP';
 
     function SAPE_client($options = null) {
-        parent::SAPE_base($options);
+        parent::__construct($options);
         $this->load_data();
     }
 
@@ -831,9 +839,9 @@ class SAPE_client extends SAPE_base {
 
     function _get_db_file() {
         if ($this->_multi_site) {
-            return dirname(__FILE__) . '/' . $this->_host . '.links.db';
+            return SAPE_base::$dir . '/' . $this->_host . '.links.db';
         } else {
-            return dirname(__FILE__) . '/links.db';
+            return SAPE_base::$dir . '/links.db';
         }
     }
 
@@ -926,7 +934,7 @@ class SAPE_context extends SAPE_base {
     var $_filter_tags = array('a', 'textarea', 'select', 'script', 'style', 'label', 'noscript', 'noindex', 'button');
 
     function SAPE_context($options = null) {
-        parent::SAPE_base($options);
+        parent::__construct($options);
         $this->load_data();
     }
 
@@ -1189,9 +1197,9 @@ class SAPE_context extends SAPE_base {
 
     function _get_db_file() {
         if ($this->_multi_site) {
-            return dirname(__FILE__) . '/' . $this->_host . '.words.db';
+            return SAPE_base::$dir . '/' . $this->_host . '.words.db';
         } else {
-            return dirname(__FILE__) . '/words.db';
+            return SAPE_base::$dir . '/words.db';
         }
     }
 
@@ -1239,7 +1247,7 @@ class SAPE_articles extends SAPE_base {
     var $_user_agent = 'SAPE_Articles_Client PHP';
 
     function SAPE_articles($options = null){
-        parent::SAPE_base($options);
+        parent::__construct($options);
         if (is_array($options) && isset($options['headers_enabled'])) {
             $this->_headers_enabled = $options['headers_enabled'];
         }
@@ -1385,7 +1393,7 @@ class SAPE_articles extends SAPE_base {
     }
 
     function _prepare_path_to_images(){
-        $this->_images_path = dirname(__FILE__) . '/images/';
+        $this->_images_path = SAPE_base::$dir . '/images/';
         if (!is_dir($this->_images_path)) {
             // Пытаемся создать папку.
             if (@mkdir($this->_images_path)) {
@@ -1644,10 +1652,10 @@ class SAPE_articles extends SAPE_base {
 
     function _get_db_file(){
         if ($this->_multi_site){
-            return dirname(__FILE__) . '/' . $this->_host . '.' . $this->_save_file_name;
+            return SAPE_base::$dir . '/' . $this->_host . '.' . $this->_save_file_name;
         }
         else{
-            return dirname(__FILE__) . '/' . $this->_save_file_name;
+            return SAPE_base::$dir . '/' . $this->_save_file_name;
         }
     }
 
